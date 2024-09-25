@@ -52,7 +52,7 @@ public class Lab_10 {
                     if (grafo.estanConectadas(ciudadA, ciudadB)) {
                         System.out.println(ciudadA + " y " + ciudadB + " están conectadas por una carretera.");
                     } else {
-                        System.out.println(ciudadA + " y " + ciudadB + " no están conectadas.");
+                        System.out.println(ciudadA + " y " + ciudadB + " no están conectadas directamente.");
                     }
                     break;
                 case 3: // Encontrar el camino más corto por distancia
