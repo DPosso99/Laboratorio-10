@@ -11,6 +11,7 @@ package com.mycompany.lab_10;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Lab_10 {
@@ -52,7 +53,7 @@ public class Lab_10 {
                     if (grafo.estanConectadas(ciudadA, ciudadB)) {
                         System.out.println(ciudadA + " y " + ciudadB + " están conectadas por una carretera.");
                     } else {
-                        System.out.println(ciudadA + " y " + ciudadB + " no están conectadas directamente.");
+                        System.out.println(ciudadA + " y " + ciudadB + " no están conectadas.");
                     }
                     break;
                 case 3: // Encontrar el camino más corto por distancia
@@ -60,24 +61,16 @@ public class Lab_10 {
                     String origenDistancia = scanner.nextLine();
                     System.out.print("Ingresa la ciudad de destino: ");
                     String destinoDistancia = scanner.nextLine();
-                    int distanciaCorta = Dijkstra.encontrarCaminoMasCorto(grafo, origenDistancia, destinoDistancia, "distancia");
-                    if (distanciaCorta != -1) {
-                        System.out.println("Camino más corto por distancia desde " + origenDistancia + " a " + destinoDistancia + ": " + distanciaCorta + " km");
-                    } else {
-                        System.out.println("No se encontró un camino entre " + origenDistancia + " y " + destinoDistancia);
-                    }
+                    Map<String, Integer> distancias = Dijkstra.encontrarCaminoMasCorto(grafo, origenDistancia, destinoDistancia, "distancia");
+                    System.out.println("Distancia más corta desde " + origenDistancia + " a " + destinoDistancia + ": " + distancias.get(destinoDistancia) + " km");
                     break;
                 case 4: // Encontrar el camino más corto por tiempo
                     System.out.print("Ingresa la ciudad de origen: ");
                     String origenTiempo = scanner.nextLine();
                     System.out.print("Ingresa la ciudad de destino: ");
                     String destinoTiempo = scanner.nextLine();
-                    int tiempoCorto = Dijkstra.encontrarCaminoMasCorto(grafo, origenTiempo, destinoTiempo, "tiempo");
-                    if (tiempoCorto != -1) {
-                        System.out.println("Camino más corto por tiempo desde " + origenTiempo + " a " + destinoTiempo + ": " + tiempoCorto + " minutos");
-                    } else {
-                        System.out.println("No se encontró un camino entre " + origenTiempo + " y " + destinoTiempo);
-                    }
+                    Map<String, Integer> tiempos = Dijkstra.encontrarCaminoMasCorto(grafo, origenTiempo, destinoTiempo, "tiempo");
+                    System.out.println("Tiempo más corto desde " + origenTiempo + " a " + destinoTiempo + ": " + tiempos.get(destinoTiempo) + " minutos");
                     break;
                 case 5: // Salir
                     System.out.println("Saliendo...");
@@ -91,26 +84,26 @@ public class Lab_10 {
     }
 
     // Cargar el grafo desde un archivo CSV
-   public static Grafo cargarGrafo(String archivo) {
-    Grafo grafo = new Grafo();
-    try (Scanner scanner = new Scanner(new File(archivo))) {
-        boolean esPrimeraLinea = true;  // Añadir un flag para saltar la primera línea
-        while (scanner.hasNextLine()) {
-            String linea = scanner.nextLine();
-            if (esPrimeraLinea) {
-                esPrimeraLinea = false;  // Saltar la primera línea del CSV
-                continue;
+    public static Grafo cargarGrafo(String archivo) {
+        Grafo grafo = new Grafo();
+        try (Scanner scanner = new Scanner(new File(archivo))) {
+            boolean esPrimeraLinea = true;  // Añadir un flag para saltar la primera línea
+            while (scanner.hasNextLine()) {
+                String linea = scanner.nextLine();
+                if (esPrimeraLinea) {
+                    esPrimeraLinea = false;  // Saltar la primera línea del CSV
+                    continue;
+                }
+                String[] datos = linea.split(",");
+                String ciudadA = datos[0].trim();
+                String ciudadB = datos[1].trim();
+                int km = Integer.parseInt(datos[2].trim());
+                int minutos = Integer.parseInt(datos[3].trim());
+                grafo.agregarArista(ciudadA, ciudadB, km, minutos);
             }
-            String[] datos = linea.split(",");
-            String ciudadA = datos[0].trim();
-            String ciudadB = datos[1].trim();
-            int km = Integer.parseInt(datos[2].trim());
-            int minutos = Integer.parseInt(datos[3].trim());
-            grafo.agregarArista(ciudadA, ciudadB, km, minutos);
+        } catch (IOException e) {
+            System.out.println("Error al cargar el archivo: " + e.getMessage());
         }
-    } catch (IOException e) {
-        System.out.println("Error al cargar el archivo: " + e.getMessage());
+        return grafo;
     }
-    return grafo;
-   }
 }

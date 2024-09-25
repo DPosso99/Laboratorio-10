@@ -11,23 +11,22 @@ package com.mycompany.lab_10;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.PriorityQueue;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import java.util.*;
-
 public class Dijkstra {
 
-    public static int encontrarCaminoMasCorto(Grafo grafo, String origen, String destino, String tipo) {
+    public static Map<String, Integer> encontrarCaminoMasCorto(Grafo grafo, String origen, String destino, String tipo) {
         Map<String, Integer> distancias = new HashMap<>();
         Map<String, Boolean> visitado = new HashMap<>();
+        Map<String, String> predecesores = new HashMap<>();  // Para rastrear el camino
         PriorityQueue<String> colaPrioridad = new PriorityQueue<>((a, b) -> distancias.get(a) - distancias.get(b));
 
-        // Inicializar distancias y visitado para todas las ciudades
+        // Inicializar distancias, visitado y predecesores
         for (String ciudad : grafo.getCiudades()) {
             distancias.put(ciudad, Integer.MAX_VALUE);
             visitado.put(ciudad, false);
+            predecesores.put(ciudad, null);  // Inicializamos los predecesores
         }
 
         distancias.put(origen, 0);
@@ -36,15 +35,10 @@ public class Dijkstra {
         while (!colaPrioridad.isEmpty()) {
             String actual = colaPrioridad.poll();
 
-            // Si la ciudad ya fue visitada, la ignoramos
             if (visitado.get(actual)) continue;
-
             visitado.put(actual, true);
 
-            // Si hemos llegado a la ciudad destino, terminamos
-            if (actual.equals(destino)) {
-                return distancias.get(actual);  // Devolver la distancia/tiempo hacia el destino
-            }
+            if (actual.equals(destino)) break;
 
             for (Arista arista : grafo.obtenerAdyacencias(actual)) {
                 String vecino = arista.getCiudadDestino();
@@ -53,11 +47,25 @@ public class Dijkstra {
 
                 if (nuevaDistancia < distancias.get(vecino)) {
                     distancias.put(vecino, nuevaDistancia);
+                    predecesores.put(vecino, actual);  // Guardar el predecesor
                     colaPrioridad.add(vecino);
                 }
             }
         }
 
-        return -1;  // Si no se encuentra el camino, devolvemos -1
+        // Imprimir el camino
+        if (predecesores.get(destino) == null) {
+            System.out.println("No hay camino disponible entre " + origen + " y " + destino);
+        } else {
+            String camino = destino;
+            String predecesor = predecesores.get(destino);
+            while (predecesor != null) {
+                camino = predecesor + " -> " + camino;
+                predecesor = predecesores.get(predecesor);
+            }
+            System.out.println("Camino más corto: " + camino);
+        }
+
+        return distancias;
     }
 }
